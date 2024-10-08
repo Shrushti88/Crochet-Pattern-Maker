@@ -1,0 +1,127 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class Crochet extends JFrame {
+
+    // Canvas grid size
+    private final int GRID_ROWS = 11;
+    private final int GRID_COLS = 11;
+    private final int CELL_SIZE = 50;
+    
+    // Current selected stitch and colour
+    private String selectedStitch = "None";
+    private Color selectedColor = Color.BLACK;
+    
+    // Grid to store stitches and their colours
+    private String[][] grid = new String[GRID_ROWS][GRID_COLS];
+    private Color[][] gridColors = new Color[GRID_ROWS][GRID_COLS];
+    
+    public Crochet() {
+        // Set up the window
+        setTitle("Crochet Pattern Maker");
+        setSize(GRID_COLS * CELL_SIZE + 200, GRID_ROWS * CELL_SIZE + 50);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Canvas for drawing the crochet grid
+        Canvas canvas = new Canvas();
+        canvas.setPreferredSize(new Dimension(GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE));
+        canvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = e.getY() / CELL_SIZE;
+                int col = e.getX() / CELL_SIZE;
+
+                if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                    if (selectedStitch.equals("Eraser")) {
+                        grid[row][col] = null;
+                        gridColors[row][col] = null;
+                    } else {
+                        grid[row][col] = selectedStitch;
+                        gridColors[row][col] = selectedColor;
+                    }
+                    canvas.repaint();
+                }
+            }
+        });
+        
+        // Stitch selection panel
+        JPanel toolPanel = new JPanel();
+        toolPanel.setLayout(new GridLayout(5, 1));
+
+        // Buttons for stitch selection
+        JButton stitch1 = new JButton("O (Chain)");
+        JButton stitch2 = new JButton("X (Single Stitch)");
+        JButton stitch3 = new JButton("T (Double Stitch)");
+        JButton stitch4 = new JButton("F (Half Double Stitch");
+        JButton eraser = new JButton("Eraser");
+
+        // Add action listeners to the buttons
+        stitch1.addActionListener(e -> {
+            selectedStitch = "O";
+            selectedColor = new Color(166, 122, 91);  // Hex Color for Single Crochet (Tomato color)
+        });
+        stitch2.addActionListener(e -> {
+            selectedStitch = "X";
+            selectedColor = new Color(193, 151, 112); // Hex Color for Double Crochet (SteelBlue)
+        });
+        stitch3.addActionListener(e -> {
+            selectedStitch = "T";
+            selectedColor = new Color(213, 184, 149); // Hex Color for Treble Crochet (LimeGreen)
+        });
+        stitch4.addActionListener(e -> {
+            selectedStitch = "F";
+            selectedColor = new Color(250, 240, 220);
+        });
+        eraser.addActionListener(e -> {
+            selectedStitch = "Eraser";
+        });
+        // Add buttons to the tool panel
+
+        toolPanel.add(stitch1);
+        toolPanel.add(stitch2);
+        toolPanel.add(stitch3);
+        toolPanel.add(stitch4);
+        toolPanel.add(eraser);
+
+        // Add canvas and tool panel to the window
+        add(canvas, BorderLayout.CENTER);
+        add(toolPanel, BorderLayout.EAST);
+        
+        setVisible(true);
+    }
+    
+    // Inner class for the drawing canvas
+    class Canvas extends JPanel {
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            // Draw the grid
+            for (int row = 0; row < GRID_ROWS; row++) {
+                for (int col = 0; col < GRID_COLS; col++) {
+                    int x = col * CELL_SIZE;
+                    int y = row * CELL_SIZE;
+
+                    // Draw grid lines
+                    g.setColor(Color.LIGHT_GRAY);
+
+                    g.drawRect(x, y, CELL_SIZE, CELL_SIZE);
+
+                    // Draw the stitch if present
+                    if (grid[row][col] != null) {
+                        g.setColor(Color.BLACK);
+                        String stitch = grid[row][col];
+                        g.drawString(stitch, x + CELL_SIZE / 2 - 5, y + CELL_SIZE / 2 + 5);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // Start the application
+        new Crochet();
+    }
+}
